@@ -1,0 +1,320 @@
+/* ==========================================================================
+   Solar System Explorer · motion and state choreography
+
+   States on .app (set by js/app.js):
+     is-loading    assets not ready yet, everything waits
+     is-departing  content of the old planet fades out, camera travels
+     is-arrived    the camera has settled: title docks, orbits, moons and
+                   description appear one after the other
+     is-traveling  camera is moving (rAF is running)
+   ========================================================================== */
+
+/* ------------------------------------------------------------ Keyframes --- */
+
+@keyframes enter-down {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes enter-right {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes moon-drift {
+  from {
+    transform: translate(calc(var(--dx, 0) * var(--pd) * -0.5), calc(var(--dy, 0) * var(--pd) * -0.5));
+  }
+  to {
+    transform: translate(calc(var(--dx, 0) * var(--pd) * 0.5), calc(var(--dy, 0) * var(--pd) * 0.5));
+  }
+}
+
+/* ------------------------------------------------------ Initial entrance --- */
+
+.brand {
+  animation: enter-down 1.6s var(--ease-out) 0.25s both;
+}
+
+.selector__item {
+  animation: enter-right 1.1s var(--ease-out) both;
+  animation-delay: calc(0.55s + var(--i, 0) * 0.07s);
+}
+
+.hint {
+  animation: enter-fade 2s ease 2.6s both;
+}
+
+.app.is-loading .brand,
+.app.is-loading .selector__item,
+.app.is-loading .hint {
+  animation-play-state: paused;
+}
+
+/* ------------------------------------------------------------ Starfield --- */
+
+.stars {
+  transition:
+    transform 1.8s var(--ease-soft),
+    opacity 1.8s ease;
+}
+
+.app.is-traveling .stars {
+  transition: none;
+}
+
+/* ----------------------------------------------------------- Headline --- */
+
+.headline {
+  transition:
+    transform 1.25s var(--ease-soft),
+    opacity 0.55s ease,
+    filter 0.55s ease;
+}
+
+.headline.is-hero {
+  transform: translateY(calc(var(--hero-top) - var(--dock-top))) scale(var(--hero-scale));
+}
+
+.app.is-loading .headline,
+.app.is-departing .headline {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(-16px);
+}
+
+.headline.no-transition,
+.no-transition .headline {
+  transition: none !important;
+}
+
+/* ------------------------------------------------------------ Details --- */
+
+.details {
+  visibility: hidden;
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.5s ease,
+    visibility 0s linear 0.5s;
+}
+
+.app.is-arrived .details {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition:
+    opacity 1.1s ease 0.9s,
+    transform 1.3s var(--ease-out) 0.9s,
+    visibility 0s linear 0s;
+}
+
+.read-more {
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    color 0.35s ease;
+}
+
+.read-more::after {
+  transform: scaleX(0);
+}
+
+.app.is-arrived .read-more {
+  opacity: 1;
+  transition:
+    opacity 0.9s ease 1.35s,
+    color 0.35s ease;
+}
+
+.app.is-arrived .read-more::after {
+  transform: scaleX(1);
+  transition:
+    transform 0.9s var(--ease-out) 1.55s,
+    box-shadow 0.4s ease;
+}
+
+/* ------------------------------------------------------ Orbits & moons --- */
+
+.orbit {
+  opacity: 0;
+  scale: 0.93;
+  transition:
+    opacity 0.45s ease,
+    scale 0.6s var(--ease-out);
+}
+
+.app.is-arrived .body.is-current .orbit {
+  opacity: 1;
+  scale: 1;
+  transition:
+    opacity 1.6s ease calc(0.2s + var(--i, 0) * 0.12s),
+    scale 2.2s var(--ease-soft) calc(0.2s + var(--i, 0) * 0.12s);
+}
+
+/* Moons only drift around the planet we are visiting */
+.moon__body {
+  animation-play-state: paused;
+}
+
+.body.is-current .moon__body {
+  animation-play-state: running;
+}
+
+.moon {
+  --moon-delay: calc(0.55s + var(--i, 0) * 0.16s);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.moon__sphere {
+  scale: 0.5;
+  transition: scale 0.5s var(--ease-out);
+}
+
+.moon__label {
+  opacity: 0;
+  translate: 0 8px;
+  transition:
+    opacity 0.35s ease,
+    translate 0.5s ease;
+}
+
+.app.is-arrived .body.is-current .moon {
+  opacity: 1;
+  transition: opacity 1.2s ease var(--moon-delay);
+}
+
+.app.is-arrived .body.is-current .moon__sphere {
+  scale: 1;
+  transition: scale 1.6s var(--ease-soft) var(--moon-delay);
+}
+
+.app.is-arrived .body.is-current .moon__label {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 1s ease calc(var(--moon-delay) + 0.4s),
+    translate 1.2s var(--ease-out) calc(var(--moon-delay) + 0.4s);
+}
+
+/* ------------------------------------------------------- Saturn's rings --- */
+
+.app.is-arrived .body.is-current .rings__disc {
+  transform: rotateX(52deg);
+  transition: transform 2.8s var(--ease-soft) 0.15s;
+}
+
+/* -------------------------------------------- Panel open: scene steps back --- */
+
+.content,
+.selector,
+.brand {
+  transition: opacity 0.6s ease;
+}
+
+.app.is-panel-open .content,
+.app.is-panel-open .selector {
+  opacity: 0.25;
+}
+
+/* --------------------------------------------- Reduced-motion crossfade --- */
+
+.space {
+  transition: opacity 0.32s ease;
+}
+
+.app.is-fading .space {
+  opacity: 0;
+}
+
+/* Intro: the scene rises out of the dark while the camera is already moving */
+.app.is-loading .space {
+  opacity: 0;
+  transition: none;
+}
+
+.app.is-intro .space {
+  transition: opacity 1.8s ease;
+}
+
+/* --------------------------------------------------- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .moon__body {
+    animation: none;
+  }
+
+  .brand,
+  .selector__item,
+  .hint {
+    animation-duration: 0.01ms;
+    animation-delay: 0s;
+  }
+
+  .headline,
+  .details,
+  .read-more,
+  .rings__disc,
+  .orbit,
+  .moon,
+  .moon__sphere,
+  .moon__label,
+  .stars {
+    transition-duration: 0.3s !important;
+    transition-delay: 0s !important;
+  }
+
+  .app.is-arrived .details,
+  .app.is-arrived .read-more,
+  .app.is-arrived .body.is-current .rings__disc,
+  .app.is-arrived .body.is-current .orbit,
+  .app.is-arrived .body.is-current .moon,
+  .app.is-arrived .body.is-current .moon__label {
+    transition-duration: 0.5s !important;
+    transition-delay: 0.1s !important;
+  }
+
+  .orbit,
+  .moon__sphere {
+    scale: 1;
+  }
+
+  .app.is-departing .headline {
+    transform: none;
+    filter: none;
+  }
+
+  .panel {
+    transform: none;
+  }
+
+  .planet-option__thumb,
+  .planet-option__name::before {
+    transition-duration: 0.01ms;
+  }
+}

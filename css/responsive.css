@@ -1,0 +1,220 @@
+/* ==========================================================================
+   Solar System Explorer · responsive layout
+   ========================================================================== */
+
+/* Touch devices get a touch hint instead of keyboard keys */
+.hint__touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .hint__pointer {
+    display: none;
+  }
+
+  .hint__touch {
+    display: inline;
+  }
+}
+
+/* ------------------------------------------------------- Big screens --- */
+
+@media (min-width: 2200px) {
+  :root {
+    --fs-ui: 12px;
+  }
+}
+
+/* --------------------------------------------- Laptops & small desktops --- */
+
+@media (max-width: 1280px) {
+  .planet-option {
+    gap: 12px;
+  }
+}
+
+/* ---------------------------- Short landscape screens (phones sideways) --- */
+
+@media (max-height: 560px) and (orientation: landscape) {
+  :root {
+    --horizon: calc(var(--H) * 0.6);
+    --d: min(66vw, calc(var(--H) * 1.32));
+    --vanish: 20%;
+    --hero-top: calc(var(--H) * 0.38);
+    --dock-top: calc(var(--horizon) + 18px);
+    --fs-name: clamp(20px, 3.2vw, 30px);
+    --fs-body: 8.5px;
+    --hero-scale: 1.2;
+    --moon-spread: 0.86;
+  }
+
+  .brand {
+    top: 12px;
+  }
+
+  .selector {
+    left: max(12px, env(safe-area-inset-left));
+  }
+
+  .selector__list {
+    gap: 0;
+  }
+
+  .planet-option {
+    padding-block: 3px;
+  }
+
+  .planet-option__au {
+    display: none;
+  }
+
+  .details {
+    width: min(520px, 62vw);
+  }
+
+  .details__text {
+    display: -webkit-box;
+    overflow: hidden;
+    line-height: 1.9;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .read-more {
+    margin-top: 4px;
+  }
+
+  .hint {
+    display: none;
+  }
+}
+
+/* ------------------------- Portrait: tablets and phones (taller than wide) --- */
+
+@media (max-aspect-ratio: 1/1) {
+  :root {
+    --d: max(124vw, calc(var(--H) * 0.6));
+    --horizon: calc(var(--H) * 0.6);
+    --vanish: 24%;
+    --hero-top: calc(var(--H) * 0.395);
+    --dock-top: calc(var(--horizon) + clamp(22px, calc(var(--H) * 0.04), 48px));
+    --moon-spread: 0.9;
+    --fs-name: clamp(24px, 5.4vw, 46px);
+    --fs-eyebrow: clamp(8px, 1.5vw, 11px);
+    --fs-body: clamp(9px, 1.55vw, 12px);
+    --fs-ui: clamp(9px, 1.35vw, 11px);
+  }
+
+  /* The vertical list becomes a horizontal, scrollable strip */
+  .selector {
+    top: calc(clamp(18px, 3.4vh, 40px) + 34px);
+    right: 0;
+    left: 0;
+    transform: none;
+  }
+
+  .selector__list {
+    flex-direction: row;
+    gap: 2px;
+    padding: 4px max(16px, env(safe-area-inset-left)) 8px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 40px;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+    touch-action: pan-x;
+  }
+
+  .selector__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .selector__item {
+    flex: none;
+    scroll-snap-align: center;
+  }
+
+  .planet-option {
+    gap: 8px;
+    padding: 8px 12px 8px 4px;
+  }
+
+  .planet-option__mark {
+    width: 32px;
+  }
+
+  .planet-option__au {
+    display: none;
+  }
+
+  .planet-option__input:checked ~ .planet-option__text .planet-option__name::before {
+    width: 14px;
+    margin-right: 7px;
+  }
+
+  .details {
+    width: min(560px, 88vw);
+  }
+
+  .hint {
+    right: 50%;
+    transform: translateX(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ------------------------------------------------------------ Phones --- */
+
+@media (max-aspect-ratio: 1/1) and (max-width: 640px) {
+  :root {
+    --d: 168vw;
+    --horizon: calc(var(--H) * 0.6);
+    --vanish: 23%;
+    --moon-spread: 0.85;
+    --hero-scale: 1.18;
+    --fs-name: clamp(22px, 7vw, 30px);
+    --fs-eyebrow: 8px;
+    --fs-body: clamp(8.5px, 2.35vw, 10px);
+    --fs-ui: 9.5px;
+  }
+
+  .brand {
+    top: max(16px, env(safe-area-inset-top));
+  }
+
+  .selector {
+    top: calc(max(16px, env(safe-area-inset-top)) + 30px);
+  }
+
+  .details__text {
+    line-height: 2;
+    letter-spacing: 0.16em;
+  }
+
+  /* Fewer moons on phones: keep the main ones, keep the scene clean */
+  .moon.is-minor,
+  .orbit.is-minor {
+    display: none;
+  }
+
+  .hint {
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .panel__stat {
+    padding: 12px;
+  }
+}
+
+@media (max-aspect-ratio: 1/1) and (max-height: 700px) {
+  .details__text {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+}

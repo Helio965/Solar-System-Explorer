@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Solar System Explorer</title>
+    <meta
+      name="description"
+      content="An interactive, cinematic journey through the planets of the Solar System, built with HTML, CSS and a pinch of JavaScript."
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23000'/%3E%3Ccircle cx='32' cy='46' r='22' fill='%233b6fb6'/%3E%3Ccircle cx='32' cy='14' r='5' fill='%23c0533a'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/planets.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#planet-content">Skip to planet information</a>
+
+    <div class="app is-loading is-departing" id="app">
+      <!-- Distant star layers (decorative) -->
+      <div class="starfield" aria-hidden="true">
+        <div class="stars stars--far"></div>
+        <div class="stars stars--near"></div>
+      </div>
+
+      <!-- The 3D scene: every body sits at its own depth; the camera travels along Z -->
+      <div class="space" aria-hidden="true">
+        <div class="system" id="system"></div>
+      </div>
+
+      <header class="brand">
+        <p class="brand__title">Solar Explorer</p>
+        <p class="brand__tag">Interactive Experience</p>
+      </header>
+
+      <nav class="selector" aria-label="Planets">
+        <fieldset class="selector__group">
+          <legend class="sr-only">Choose a world to visit</legend>
+          <ul class="selector__list" id="planet-list"></ul>
+        </fieldset>
+      </nav>
+
+      <!-- Title shown while flying past (and towards) a planet -->
+      <div class="flyby" id="flyby" aria-hidden="true">
+        <span class="flyby__eyebrow" id="flyby-eyebrow"></span>
+        <span class="flyby__name" id="flyby-name"></span>
+      </div>
+
+      <main class="content" id="planet-content" tabindex="-1">
+        <h1 class="headline" id="headline">
+          <span class="headline__eyebrow" id="headline-eyebrow">Planet</span>
+          <span class="headline__name" id="headline-name">Earth</span>
+        </h1>
+        <div class="details">
+          <p class="details__text" id="details-text"></p>
+          <button class="read-more" id="read-more" type="button" aria-haspopup="dialog" aria-controls="planet-panel">
+            Read more
+          </button>
+        </div>
+        <p class="sr-only" id="announcer" aria-live="polite" aria-atomic="true"></p>
+      </main>
+
+      <p class="hint" aria-hidden="true">
+        <span class="hint__pointer"><kbd>↑</kbd><kbd>↓</kbd> travel <span class="hint__sep">·</span> scroll</span>
+        <span class="hint__touch">Swipe up or down to travel</span>
+      </p>
+
+      <noscript>
+        <p class="noscript">Solar System Explorer needs JavaScript enabled to run the camera between planets.</p>
+      </noscript>
+    </div>
+
+    <!-- READ MORE panel -->
+    <dialog class="panel" id="planet-panel" aria-labelledby="panel-title">
+      <div class="panel__inner">
+        <button class="panel__close" id="panel-close" type="button" aria-label="Close information panel" autofocus>
+          <span aria-hidden="true"></span>
+        </button>
+        <div class="panel__hero" aria-hidden="true">
+          <div class="panel__planet" id="panel-planet"></div>
+        </div>
+        <p class="panel__eyebrow" id="panel-eyebrow"></p>
+        <h2 class="panel__title" id="panel-title"></h2>
+        <div class="panel__body" id="panel-body"></div>
+        <dl class="panel__stats" id="panel-stats"></dl>
+        <section class="panel__moons" id="panel-moons-section" aria-labelledby="panel-moons-title">
+          <h3 class="panel__subtitle" id="panel-moons-title">Main moons</h3>
+          <ul class="panel__moon-list" id="panel-moons"></ul>
+        </section>
+        <p class="panel__fact" id="panel-fact"></p>
+      </div>
+    </dialog>
+
+    <script src="js/planets.js" defer></script>
+    <script src="js/app.js" defer></script>
+  </body>
+</html>

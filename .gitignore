@@ -1,0 +1,13 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Tooling
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+*.log
